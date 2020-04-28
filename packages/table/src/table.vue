@@ -12,7 +12,9 @@
       'el-table--enable-row-hover': !store.states.isComplex,
       'el-table--enable-row-transition': (store.states.data || []).length !== 0 && (store.states.data || []).length < 100
     }, tableSize ? `el-table--${ tableSize }` : '']"
-    @mouseleave="handleMouseLeave($event)">
+    @mouseleave="handleMouseLeave($event)"
+    
+    >
     <div class="hidden-columns" ref="hiddenColumns"><slot></slot></div>
     <div
       v-if="showHeader"
@@ -33,7 +35,13 @@
       class="el-table__body-wrapper"
       ref="bodyWrapper"
       :class="[layout.scrollX ? `is-scrolling-${scrollPosition}` : 'is-scrolling-none']"
-      :style="[bodyHeight]">
+      :style="[bodyHeight]"
+      style="overflow-y:auto"
+      v-infinite-scroll="tableInfiniteScroll"
+      :infinite-scroll-immediate="true"
+      :infinite-scroll-disabled="infiniteScrollDisabled"
+      infinite-scroll-delay="infiniteScrollDelay"
+      >
       <table-body
         :context="context"
         :store="store"
@@ -43,7 +51,9 @@
         :highlight="highlightCurrentRow"
         :style="{
            width: bodyWidth
-        }">
+        }"
+      
+        >
       </table-body>
       <div
         v-if="!data || data.length === 0"
@@ -244,7 +254,19 @@
           return [];
         }
       },
-
+      tableInfiniteScroll: Function,
+      infiniteScrollImmediate: {
+        type: Boolean,
+        default: true
+      },
+      infiniteScrollDisabled: {
+        type: Boolean,
+        default: false
+      },
+      infiniteScrollDelay: {
+        type: Number,
+        default: 200
+      },
       size: String,
 
       width: [String, Number],
